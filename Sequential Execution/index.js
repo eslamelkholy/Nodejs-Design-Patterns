@@ -1,25 +1,26 @@
-const tasks = [
-  (cb) => {
-    console.log('Task1 Started Execution');
-    setTimeout(cb, 1000);
-  },
-  (cb) => {
-    console.log('Task2 Started Execution');
-    setTimeout(cb, 1000);
-  },
-  (cb) => {
-    console.log('Task3 Started Execution');
-    setTimeout(cb, 1000);
-  },
-];
+function asyncOperation(cb) {
+  process.nextTick(cb);
+}
 
-const iterate = (index) => {
-  if (index === tasks.length) return finish();
+function task1(cb) {
+  asyncOperation(() => {
+    task2(cb);
+  });
+}
 
-  const task = tasks[index];
-  task(() => iterate(index + 1));
-};
+function task2(cb) {
+  asyncOperation(() => {
+    task3(cb);
+  });
+}
 
-const finish = () => console.log('All Tasks Executed Successfully');
+function task3(cb) {
+  asyncOperation(() => {
+    cb(); // finally executes the callback
+  });
+}
 
-iterate(0);
+task1(() => {
+  // executed when task1, task2 and task3 are completed
+  console.log('tasks 1, 2 and 3 executed');
+});
